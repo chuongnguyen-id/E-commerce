@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Header.module.scss";
-import { Link } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { FaShoppingCart, FaTimes, FaUserCircle } from "react-icons/fa";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/config";
+import { toast } from "react-toastify";
 
 const logo = (
   <div className={styles.logo}>
@@ -24,8 +27,24 @@ const cart = (
   </span>
 );
 
+const activeLink = ({ isActive }) => (isActive ? `${styles.active}` : "");
+
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
+  const [displayName, setDisplayName] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        console.log(user.displayName);
+        setDisplayName(user.displayName);
+      } else {
+        setDisplayName("");
+      }
+    });
+  });
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -33,6 +52,17 @@ const Header = () => {
 
   const hideMenu = () => {
     setShowMenu(false);
+  };
+
+  const logoutUser = () => {
+    signOut(auth)
+      .then(() => {
+        toast.success("Logout Successful...");
+        navigate("/login");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   return (
@@ -52,23 +82,44 @@ const Header = () => {
             }
             onClick={hideMenu}
           ></div>
+
           <ul onClick={hideMenu}>
-            <li>
-              <Link to="/">Home</Link>
+            <li className={styles["logo-mobile"]}>
+              {logo} <FaTimes size={22} color="#fff" onClick={hideMenu} />
             </li>
             <li>
-              <Link to="/contact">Contact Us</Link>
+              <NavLink to="/" className={activeLink}>
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/contact" className={activeLink}>
+                Contact Us
+              </NavLink>
             </li>
           </ul>
 
           <div className={styles["header-right"]} onClick={hideMenu}>
             <span className={styles.links}>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
-              <Link to="/order-history">My Orders</Link>
+              <NavLink to="/login" className={activeLink}>
+                Login
+              </NavLink>
+              <a href="#">
+                <FaUserCircle size={16} />
+                Hi, {displayName}
+              </a>
+              <NavLink to="/register" className={activeLink}>
+                Register
+              </NavLink>
+              <NavLink to="/order-history" className={activeLink}>
+                My Orders
+              </NavLink>
+              <NavLink to="/order-history" onClick={logoutUser}>
+                Logout
+              </NavLink>
             </span>
+            {cart}
           </div>
-          {cart}
         </nav>
 
         <div className={styles["menu-icon"]}>
