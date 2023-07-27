@@ -27,7 +27,7 @@ const Login = () => {
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        const user = userCredential.user;
+        // const user = userCredential.user;
         // console.log(user);
         setIsLoading(false);
         toast.success("Login Successfully!");

@@ -13,7 +13,7 @@
   width: 100%;
   height: 100%;
   opacity: 0;
-  transform: translateX(-50%);
+  transform: translateX(50%);
   transition: all 0.5s ease;
 }
 
@@ -80,6 +80,7 @@
 .current .content {
   opacity: 1;
 }
+
 .arrow {
   border: 2px solid orangered;
   border-radius: 50%;

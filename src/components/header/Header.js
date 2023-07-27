@@ -45,10 +45,9 @@ const Header = () => {
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log(user);
+        // console.log(user);
         if (user.displayName == null) {
           const userName = user.email.slice(0, -10);
-          console.log(userName);
           setDisplayName(userName);
         } else {
           setDisplayName(user.displayName);
