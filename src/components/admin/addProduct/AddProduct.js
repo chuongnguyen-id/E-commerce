@@ -5,9 +5,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { selectProducts } from "../../../redux/slice/productSlice";
 import Card from "../../card/Card";
 import { db, storage } from "../../../firebase/config";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { toast } from "react-toastify";
-import { Timestamp, addDoc, collection } from "firebase/firestore";
+import { Timestamp, addDoc, collection, doc, setDoc } from "firebase/firestore";
 import Loader from "./../../loader/Loader";
 
 const categories = [
@@ -27,16 +32,27 @@ const initialState = {
 };
 
 const AddProduct = () => {
-  // const {id}=useParams();
-  // const products = useSelector(selectProducts);
-  // const productEdit = products.find((item)=>item.id ===id);
-  const [product, setProduct] = useState({
-    ...initialState,
-  });
+  const { id } = useParams();
+  const products = useSelector(selectProducts);
+  const productEdit = products.find((item) => item.id === id);
+
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
+
   const navigate = useNavigate();
+
+  const detectForm = (id, f1, f2) => {
+    if (id === "ADD") {
+      return f1;
+    }
+    return f2;
+  };
+
+  const [product, setProduct] = useState(() => {
+    const newState = detectForm(id, { ...initialState }, productEdit);
+    return newState;
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,17 +85,16 @@ const AddProduct = () => {
 
   const addProduct = (e) => {
     e.preventDefault();
-    console.log(product);
     setIsLoading(true);
     try {
-      const docRef = addDoc(collection(db, "products"), {
+      addDoc(collection(db, "products"), {
         name: product.name,
         imageURL: product.imageURL,
         price: Number(product.price),
         category: product.category,
         brand: product.brand,
         desc: product.desc,
-        createAt: Timestamp.now().toDate(),
+        createdAt: Timestamp.now().toDate(),
       });
 
       setIsLoading(false);
@@ -93,13 +108,43 @@ const AddProduct = () => {
     }
   };
 
+  const editProduct = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (product.imageURL !== productEdit.imageURL) {
+      const storageRef = ref(storage, productEdit.imageURL);
+      deleteObject(storageRef);
+    }
+
+    try {
+      setDoc(doc(db, "products", id), {
+        name: product.name,
+        imageURL: product.imageURL,
+        price: Number(product.price),
+        category: product.category,
+        brand: product.brand,
+        desc: product.desc,
+        createdAt: productEdit.createdAt,
+        editedAt: Timestamp.now().toDate(),
+      });
+
+      setIsLoading(false);
+      toast.success("Product Edited Successfully!");
+      navigate("/admin/all-products");
+    } catch (error) {
+      setIsLoading(false);
+      toast.error(error.message);
+    }
+  };
+
   return (
     <>
       {isLoading && <Loader />}
       <div className={styles.product}>
-        <h1>Add New Product</h1>
+        <h1>{detectForm(id, "Add New Product", "Edit Product")}</h1>
         <Card cardClass={styles.card}>
-          <form onSubmit={addProduct}>
+          <form onSubmit={detectForm(id, addProduct, editProduct)}>
             <label>Product Name:</label>
             <input
               type="text"
@@ -191,7 +236,9 @@ const AddProduct = () => {
               cols="30"
             ></textarea>
 
-            <button className="--btn --btn-primary">Save Product</button>
+            <button className="--btn --btn-primary">
+              {detectForm(id, "Save Product", "Edit Product")}
+            </button>
           </form>
         </Card>
       </div>

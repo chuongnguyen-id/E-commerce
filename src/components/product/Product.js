@@ -3,13 +3,14 @@ import styles from "./Product.module.scss";
 import spinnerImg from "../../assets/spinner.jpg";
 import useFetchCollection from "../../customHooks/useFetchCollection";
 import { useDispatch, useSelector } from "react-redux";
-import { STORE_PRODUCTS } from "../../redux/slice/productSlice";
+import { STORE_PRODUCTS, selectProducts } from "../../redux/slice/productSlice";
+import ProductFilter from "./productFilter/ProductFilter";
+import ProductList from "./productList/ProductList";
 
 const Product = () => {
   const { data, isLoading } = useFetchCollection("products");
-  //   const products = useSelector(selectProducts)
+  const products = useSelector(selectProducts);
   const dispatch = useDispatch();
-  console.log(data);
 
   useEffect(() => {
     dispatch(
@@ -22,15 +23,20 @@ const Product = () => {
   return (
     <section>
       <div className={`container ${styles.product}`}>
-        <aside></aside>
+        <aside className={styles.filter}>
+          {isLoading ? null : <ProductFilter />}
+        </aside>
         <div className={styles.content}>
-            {isLoading?
-          <img
-            src={spinnerImg}
-            alt="Loading..."
-            style={{ width: "50px" }}
-            className="--center-all"
-          />:''}
+          {isLoading ? (
+            <img
+              src={spinnerImg}
+              alt="Loading..."
+              style={{ width: "50px" }}
+              className="--center-all"
+            />
+          ) : (
+            <ProductList products={products} />
+          )}
         </div>
       </div>
     </section>
