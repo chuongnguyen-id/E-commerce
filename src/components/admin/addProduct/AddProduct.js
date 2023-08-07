@@ -38,7 +38,6 @@ const AddProduct = () => {
 
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
 

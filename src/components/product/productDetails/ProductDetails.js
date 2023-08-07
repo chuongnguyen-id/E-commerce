@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -34,7 +35,7 @@ const ProductDetails = () => {
       <div className={`container ${styles.product}`}>
         <h2>Product Details</h2>
         <div>
-          <Link to={"#/products"}>&larr; Back To Products</Link>
+          <Link to={"/#products"}>&larr; Back To Products</Link>
         </div>
         {product === null ? (
           <img src={spinnerImg} alt="Loading..." style={{ width: "50px" }} />
