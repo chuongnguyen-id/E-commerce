@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Product.module.scss";
 import spinnerImg from "../../assets/spinner.jpg";
 import useFetchCollection from "../../customHooks/useFetchCollection";
@@ -10,9 +10,11 @@ import {
 } from "../../redux/slice/productSlice";
 import ProductFilter from "./productFilter/ProductFilter";
 import ProductList from "./productList/ProductList";
+import { FaCogs } from "react-icons/fa";
 
 const Product = () => {
   const { data, isLoading } = useFetchCollection("products");
+  const [showFilter, setShowFilter] = useState(false);
   const products = useSelector(selectProducts);
   const dispatch = useDispatch();
 
@@ -26,10 +28,18 @@ const Product = () => {
     dispatch(GET_PRICE_RANGE({ products: data }));
   }, [dispatch, data]);
 
+  const toggleFilter = () => {
+    setShowFilter(!showFilter);
+  };
+
   return (
     <section>
       <div className={`container ${styles.product}`}>
-        <aside className={styles.filter}>
+        <aside
+          className={
+            showFilter ? `${styles.filter} ${styles.show}` : `${styles.filter}`
+          }
+        >
           {isLoading ? null : <ProductFilter />}
         </aside>
         <div className={styles.content}>
@@ -43,6 +53,10 @@ const Product = () => {
           ) : (
             <ProductList products={products} />
           )}
+          <div className={styles.icon} onClick={toggleFilter}>
+            <FaCogs size={20} color="orangered" />
+            <b>{showFilter ? "Hide Filter" : "Show Filter"}</b>
+          </div>
         </div>
       </div>
     </section>

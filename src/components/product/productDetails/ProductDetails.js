@@ -6,10 +6,15 @@ import { db } from "../../../firebase/config";
 import { toast } from "react-toastify";
 import styles from "./ProductDetails.module.scss";
 import spinnerImg from "../../../assets/spinner.jpg";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCartItems } from "../../../redux/slice/cartSlice";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+
+  const dispatch = useDispatch();
+  const cartItems = useSelector(selectCartItems);
 
   const getProduct = async () => {
     const docRef = doc(db, "products", id);
@@ -29,6 +34,10 @@ const ProductDetails = () => {
   useEffect(() => {
     getProduct();
   }, []);
+
+  const decreaseCart = (product) => {};
+
+  const addToCart = (product) => {};
 
   return (
     <section>
@@ -56,13 +65,25 @@ const ProductDetails = () => {
                   <b>Brand</b> {product.brand}
                 </p>
                 <div className={styles.count}>
-                  <button className="--btn">-</button>
+                  <button
+                    className="--btn"
+                    onClick={() => decreaseCart(product)}
+                  >
+                    -
+                  </button>
                   <p>
                     <b>1</b>
                   </p>
-                  <button className="--btn">+</button>
+                  <button className="--btn" onClick={() => addToCart(product)}>
+                    +
+                  </button>
                 </div>
-                <button className="--btn --btn-danger">ADD TO CART</button>
+                <button
+                  className="--btn --btn-danger"
+                  onClick={() => addToCart(product)}
+                >
+                  ADD TO CART
+                </button>
               </div>
             </div>
           </>
