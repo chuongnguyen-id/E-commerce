@@ -15,12 +15,12 @@ import Pagination from "../../pagination/Pagination";
 const ProductList = ({ products }) => {
   const [grid, setGrid] = useState(true);
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("");
+  const [sort, setSort] = useState("latest");
   const filteredProducts = useSelector(selectFilteredProducts);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage, setProductsPerPage] = useState(1);
+  const [productsPerPage] = useState(9);
   // Get Current Products
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -40,7 +40,7 @@ const ProductList = ({ products }) => {
   }, [dispatch, products, search]);
 
   return (
-    <div className={styles["product-list"]}>
+    <div className={styles["product-list"]} id="product">
       <div className={styles.top}>
         <div className={styles.icons}>
           <BsFillGridFill
